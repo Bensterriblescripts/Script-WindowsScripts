@@ -9,7 +9,14 @@
     mc:Ignorable="d">
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="fixUpdatesButton" Click="FixUpdates">Fix Windows Update</Button>
-        <Button x:Name="fixRefreshMonitorsButton" Click="FixRefreshMonitors">Refresh Monitors</Button>
+
+        <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+            <TextBlock Text="Fix Windows Update" HorizontalAlignment="Center"/>
+            <Button x:Name="fixUpdatesButton" Click="FixUpdates" HorizontalAlignment="Center">Run</Button>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+            <TextBlock Text="Refresh Monitors" HorizontalAlignment="Center"/>
+            <Button x:Name="fixRefreshMonitorsButton" Click="FixRefreshMonitors" HorizontalAlignment="Center">Start</Button>
+        </StackPanel>
     </StackPanel>
 </Window>

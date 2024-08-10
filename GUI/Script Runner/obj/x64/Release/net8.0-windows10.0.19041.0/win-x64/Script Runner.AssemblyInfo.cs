@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Script Runner")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+99a187c2b71a597327e27d37d4a591bd731700c8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac7a3d2a4e3dd30784c3f046192912897075bae9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Script Runner")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Script Runner")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

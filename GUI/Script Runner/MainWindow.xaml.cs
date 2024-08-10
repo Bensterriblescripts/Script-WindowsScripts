@@ -2,7 +2,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
-using System.Security.Principal;
 using System.IO;
 
 namespace Script_Runner
@@ -16,7 +15,6 @@ namespace Script_Runner
         string buttoncontent = string.Empty;
 
         // Script paths
-        string restart_monitorprocess = "C:\\Repositories\\Script-WindowsScripts\\Refresh Monitors.ps1";
         string fix_windowsupdate = "C:\\Repositories\\Script-WindowsScripts\\Fix Windows Update.ps1";
 
         public MainWindow() {
@@ -26,15 +24,12 @@ namespace Script_Runner
         }
 
         // Button On-Click
-        public bool ButtonClickHandler (Button button) {
-
+        private async void ButtonClickHandler (Button button) {
             function_tracker = "ButtonClickHandler";
-            errormessage = string.Empty;
 
             // Just in case
             if (button == null) {
                 errormessage = "Button is null.";
-                return false;
             }
 
             // Change the button description
@@ -42,38 +37,39 @@ namespace Script_Runner
                 buttoncontent = button.Content as string;
                 button.Content = "Running...";
                 button.IsEnabled = false;
-                return true;
-            }
-            else {
-                return false;
             }
         }
         // Button Finish
-        public void ButtonFinishHandler (Button button, bool opt) {
+        private void ButtonFinishHandler (Button button, bool opt) {
+            function_tracker = "ButtonFinishHandler";
 
-            // Just in case..
             if (button.Content != null) {
 
-                // Re-enable the button if set
-                if (opt) {
-                    button.Content = buttoncontent;
+                // Re-enables button and replace button text
+                if (opt && string.IsNullOrEmpty(errormessage)) {
                     button.IsEnabled = true;
+                    button.Content = "Run Again";
                 }
-
-                // Set it to greyed finish if not
-                else {
+                else if (opt && !string.IsNullOrEmpty(errormessage)) {
+                    button.IsEnabled = true;
+                    button.Content = "Retry";
+                }
+                else if (string.IsNullOrEmpty(errormessage)) {
                     button.Content = "Finished";
                 }
+                else { 
+                    button.Content = "Error";
+                }
             }
-            return;
+
+            errormessage = string.Empty;
         }
 
-        // Run a PowerShell Script
+        // Execute PowerShell Script
         private void ExecutePowershell(string path) {
+            function_tracker = "ExecutePowershell";
 
             scriptrunning = true;
-
-            function_tracker = "ExecutePowershell";
 
             // Make sure the script exists
             if (!File.Exists(path)) {
@@ -82,7 +78,7 @@ namespace Script_Runner
                 return;
             }
 
-            // Start the process information
+            // Build the process information
             ProcessStartInfo startInfo = new ProcessStartInfo();
             Debug.WriteLine("Starting the process information...");
             Debug.WriteLine("Process path set to: " + path);
@@ -99,7 +95,7 @@ namespace Script_Runner
             try {
                 using (Process process = new Process()) {
 
-                    // Start the process
+                    // Execute
                     process.StartInfo = startInfo;
                     process.Start();
 
@@ -126,8 +122,8 @@ namespace Script_Runner
                     Debug.WriteLine("Script ran sucessfully");
                 }
             }
-            catch (Exception e) {
-                errormessage = "Script failed with exception: " + e.Message;
+            catch (System.ComponentModel.Win32Exception e) {
+                errormessage = "Elevation is required " + e;
                 scriptrunning = false;
             }
             finally {
@@ -135,8 +131,9 @@ namespace Script_Runner
             }
         }
 
-        // Execute Powershell Commands
-        private void ExecutePowershellCommand(string command) {
+        // Execute Powershell Command
+        private void ExecutePowershellCommand(string command) { 
+            function_tracker = "ExecutePowershellCommand";
 
             scriptrunning = true;
 
@@ -148,14 +145,25 @@ namespace Script_Runner
             process.StartInfo.UseShellExecute = true;
             process.StartInfo.CreateNoWindow = false;
 
-            process.Start();
-            process.WaitForExit();
+            try {
+                process.Start();
+                process.WaitForExit();
 
-            scriptrunning = false;
+                scriptrunning = false;
+            }
+            catch (System.ComponentModel.Win32Exception e) {
+                errormessage = "Elevation is required " + e;
+                scriptrunning = false;
+            }
+            catch (Exception e) {
+                errormessage = "Process error: " + e;
+                scriptrunning = false;
+            }
         }
 
-        // Execute CMD Commands
+        // Execute CMD Command
         private void ExecuteCMDCommand (string command) {
+            function_tracker = "ExecuteCMDCommand";
 
             scriptrunning = true;
 
@@ -169,6 +177,11 @@ namespace Script_Runner
             try {
                 process.Start();
                 process.WaitForExit();
+
+                scriptrunning = false;
+            }
+            catch (System.ComponentModel.Win32Exception e) {
+                errormessage = "Elevation is required " + e;
                 scriptrunning = false;
             }
             catch (Exception e) {
@@ -184,9 +197,8 @@ namespace Script_Runner
             if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start-Process -FilePath \"DisplaySwitch.exe\" -ArgumentList \"/internal\""); }
             if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start-Sleep -Seconds 2"); }
             if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start - Process - FilePath \"DisplaySwitch.exe\" - ArgumentList \"/extend\""); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonFinishHandler(button, true); }
             if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
-            return;
+            if (!scriptrunning) { ButtonFinishHandler(button, true); }
         }
         private void FixUpdates(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
@@ -194,9 +206,8 @@ namespace Script_Runner
             if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershell(fix_windowsupdate); }
             if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecuteCMDCommand("sfc /scannow"); }
             if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecuteCMDCommand("DISM /online /cleanup-image /restorehealth"); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonFinishHandler(button, false); }
             if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || "  + errormessage); }
-            return;
+            if (!scriptrunning) { ButtonFinishHandler(button, false); }
         }
     }
 }
