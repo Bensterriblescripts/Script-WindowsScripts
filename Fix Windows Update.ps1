@@ -1,6 +1,7 @@
-# # Copied from a facebook comment, based on the batch version: https://answers.microsoft.com/en-us/windows/forum/all/how-toreset-windows-update-components-in-windows/14b86efd-1420-4916-9832-829125b1e8a3
-$ErrorActionPreference = "SilentlyContinue"
+# # # Created by Ben
+# # # Based on the batch version: https://answers.microsoft.com/en-us/windows/forum/all/how-toreset-windows-update-components-in-windows/14b86efd-1420-4916-9832-829125b1e8a3
 
+$ErrorActionPreference = "SilentlyContinue"
 # Clear settings visibility (sometimes hides options)
 $Value = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer").SettingsPageVisibility
 if ($Value) {
@@ -87,7 +88,7 @@ Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Windo
 Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name PingID | Out-Null
 Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name SusClientId | Out-Null
 
-# Reset the network adaptor
+# Reset the windows sockets api
 Write-Host "Resetting the WinSock..."
 netsh winsock reset
 netsh winhttp reset proxy
@@ -106,7 +107,11 @@ Write-Host "Forcing Discovery..."
 Start-Process wuauclt -ArgumentList "/resetauthorization /detectnow" -Wait -NoNewWindow -PassThru
 
 # Scan for corrupted files
-sfc /scannow
-
-# Cleanup the windows image
-DISM /online /cleanup-image /restorehealth
+Write-Host "Scanning for corrupted files..."
+$sfc_result = sfc /scannow
+if (!$sfc_result.Contains("Windows Resource Protection did not find any integrity violations.")) {
+    # Cleanup the windows image
+    Write-Host "Corrupted files found."
+    Write-Host "Restoring Windows Image..."
+    DISM /online /cleanup-image /restorehealth
+}
