@@ -1,3 +1,7 @@
 
 *.v2
 /GUI/Script Runner/.vs
+/GUI/Script Runner/obj
+/GUI/Script Runner/obj
+/GUI/Script Runner/obj
+/GUI/Script Runner/obj/x64

@@ -2,23 +2,26 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
-using System.IO;
 
 namespace Script_Runner
 {
     public sealed partial class MainWindow : Window
     {
+        // Public Variables
+        public bool scriptrunning = false;
+        public string errormessage = string.Empty;
+        public string function_tracker = string.Empty;
         // Variables
-        bool scriptrunning = false;
-        string errormessage = string.Empty;
-        string function_tracker = string.Empty;
         string buttoncontent = string.Empty;
+
+        // Classes
+        Execute execute = new Execute();
 
         // Script paths
         string fix_windowsupdate = "C:\\Repositories\\Script-WindowsScripts\\Fix Windows Update.ps1";
+        string fix_rightclick = "C:\\Repositories\\Script-WindowsScripts\\Restore Right-Click Context Menu.ps1";
 
         public MainWindow() {
-
             Console.WriteLine("Launching...");
             this.InitializeComponent();
         }
@@ -30,6 +33,16 @@ namespace Script_Runner
             // Just in case
             if (button == null) {
                 errormessage = "Button is null.";
+                return;
+            }
+            // Handle simultaneous scripts or errors
+            if (scriptrunning) {
+                errormessage = "A script is already running";
+                // Add a 'queue' system here - do not async/overlap
+                return;
+            }
+            else if (string.IsNullOrEmpty(errormessage)) {
+                return;
             }
 
             // Change the button description
@@ -65,149 +78,31 @@ namespace Script_Runner
             errormessage = string.Empty;
         }
 
-        // Execute PowerShell Script
-        private void ExecutePowershell(string path) {
-            function_tracker = "ExecutePowershell";
-
-            scriptrunning = true;
-
-            // Make sure the script exists
-            if (!File.Exists(path)) {
-                errormessage = "File does not exist in path: " + path;
-                scriptrunning = false;
-                return;
-            }
-
-            // Build the process information
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            Debug.WriteLine("Starting the process information...");
-            Debug.WriteLine("Process path set to: " + path);
-            startInfo.FileName = "powershell.exe";
-            startInfo.Arguments = $"-ExecutionPolicy Unrestricted -File \"{path}\"";
-            startInfo.RedirectStandardOutput = false; // Move output to IOStream
-            startInfo.RedirectStandardError = false; // Move errors to IOStream
-            startInfo.UseShellExecute = false; // Run from the OS or powershell.exe
-            startInfo.CreateNoWindow = false; // Silent
-            startInfo.Verb = "runas"; // Run as admin
-
-            // Execute
-            Debug.WriteLine("Starting the process...");
-            try {
-                using (Process process = new Process()) {
-
-                    // Execute
-                    process.StartInfo = startInfo;
-                    process.Start();
-
-                    // Check if the process is running
-                    if (process == null) {
-                        errormessage = "Process did not start.";
-                        scriptrunning = false;
-                        return;
-                    }
-
-                    // Wait for exit
-                    Debug.WriteLine("Awaiting script completion...");
-                    process.WaitForExit();
-
-                    // Check return state
-                    int exitcode = process.ExitCode;
-                    if (exitcode != 0) {
-                        errormessage = "Script failed with errorcode " + exitcode + ".";
-                        scriptrunning = false;
-                        return;
-                    }
-
-                    scriptrunning = false;
-                    Debug.WriteLine("Script ran sucessfully");
-                }
-            }
-            catch (System.ComponentModel.Win32Exception e) {
-                errormessage = "Elevation is required " + e;
-                scriptrunning = false;
-            }
-            finally {
-                scriptrunning = false;
-            }
-        }
-
-        // Execute Powershell Command
-        private void ExecutePowershellCommand(string command) { 
-            function_tracker = "ExecutePowershellCommand";
-
-            scriptrunning = true;
-
-            var process = new Process();
-            process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = $"{command}";
-            process.StartInfo.Verb = "runas";
-            process.StartInfo.RedirectStandardOutput = false;
-            process.StartInfo.UseShellExecute = true;
-            process.StartInfo.CreateNoWindow = false;
-
-            try {
-                process.Start();
-                process.WaitForExit();
-
-                scriptrunning = false;
-            }
-            catch (System.ComponentModel.Win32Exception e) {
-                errormessage = "Elevation is required " + e;
-                scriptrunning = false;
-            }
-            catch (Exception e) {
-                errormessage = "Process error: " + e;
-                scriptrunning = false;
-            }
-        }
-
-        // Execute CMD Command
-        private void ExecuteCMDCommand (string command) {
-            function_tracker = "ExecuteCMDCommand";
-
-            scriptrunning = true;
-
-            var process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = $"/C {command}";
-            process.StartInfo.Verb = "runas";
-            process.StartInfo.RedirectStandardOutput = false;
-            process.StartInfo.UseShellExecute = true;
-            process.StartInfo.CreateNoWindow = false;
-            try {
-                process.Start();
-                process.WaitForExit();
-
-                scriptrunning = false;
-            }
-            catch (System.ComponentModel.Win32Exception e) {
-                errormessage = "Elevation is required " + e;
-                scriptrunning = false;
-            }
-            catch (Exception e) {
-                errormessage = "Command ended with error: " + e;
-                scriptrunning = false;
-            }
-        }
-
         // Button Triggers
         private void FixRefreshMonitors(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonClickHandler(button); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start-Process -FilePath \"DisplaySwitch.exe\" -ArgumentList \"/internal\""); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start-Sleep -Seconds 2"); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start - Process - FilePath \"DisplaySwitch.exe\" - ArgumentList \"/extend\""); }
+            ButtonClickHandler(button);
+            execute.ExecutePowershellCommand("Start-Process -FilePath \"DisplaySwitch.exe\" -ArgumentList \"/internal\"", this);
+            execute.ExecutePowershellCommand("Start-Sleep -Seconds 2", this);
+            execute.ExecutePowershellCommand("Start - Process - FilePath \"DisplaySwitch.exe\" - ArgumentList \"/extend\"", this);
             if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
-            if (!scriptrunning) { ButtonFinishHandler(button, true); }
+            ButtonFinishHandler(button, true);
         }
         private void FixUpdates(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonClickHandler(button); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershell(fix_windowsupdate); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecuteCMDCommand("sfc /scannow"); }
-            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecuteCMDCommand("DISM /online /cleanup-image /restorehealth"); }
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || "  + errormessage); }
-            if (!scriptrunning) { ButtonFinishHandler(button, false); }
+            ButtonClickHandler(button);
+            execute.ExecutePowershell(fix_windowsupdate, this);
+            execute.ExecuteCMDCommand("sfc /scannow", this);
+            execute.ExecuteCMDCommand("DISM /online /cleanup-image /restorehealth", this);
+            Debug.WriteLine("Error || " + function_tracker + " || "  + errormessage);
+            ButtonFinishHandler(button, false);
+        }
+        private void FixRightClick(object sender, RoutedEventArgs e) {
+            Button button = sender as Button;
+            ButtonClickHandler(button);
+            execute.ExecutePowershell(fix_rightclick, this);
+            Debug.WriteLine("Error || " + function_tracker + " || " + errormessage);
+            ButtonFinishHandler(button, false);
         }
     }
 }

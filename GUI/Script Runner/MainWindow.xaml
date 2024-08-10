@@ -18,5 +18,9 @@
             <TextBlock Text="Refresh Monitors" HorizontalAlignment="Center"/>
             <Button x:Name="fixRefreshMonitorsButton" Click="FixRefreshMonitors" HorizontalAlignment="Center">Start</Button>
         </StackPanel>
+        <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+            <TextBlock Text="Change Right-Click Menu" HorizontalAlignment="Center"/>
+            <Button x:Name="fixRightClick" Click="FixRightClick" HorizontalAlignment="Center">Run</Button>
+        </StackPanel>
     </StackPanel>
 </Window>
