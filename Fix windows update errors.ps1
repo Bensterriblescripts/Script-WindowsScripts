@@ -104,3 +104,9 @@ ForEach ($Service in $Services) {
 # Enable update discovery again
 Write-Host "Forcing Discovery..."
 Start-Process wuauclt -ArgumentList "/resetauthorization /detectnow" -Wait -NoNewWindow -PassThru
+
+# Scan for corrupted files
+sfc /scannow
+
+# Cleanup the windows image
+DISM /online /cleanup-image /restorehealth
