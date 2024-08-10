@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Script Runner (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Script Runner (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
