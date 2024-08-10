@@ -1,88 +1,83 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Principal;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage.Pickers.Provider;
-using System.Threading.Tasks;
 
 namespace Script_Runner
 {
-
     public sealed partial class MainWindow : Window
     {
         // Variables
-        bool debug = true;
-        string errormessage = string.Empty;
         bool scriptrunning = false;
+        string errormessage = string.Empty;
+        string function_tracker = string.Empty;
+        string buttoncontent = string.Empty;
 
         // Script paths
-        string refresh_monitors = "C:\\Repositories\\Script-WindowsScripts\\Refresh Monitors.ps1";
+        string restart_monitorprocess = "C:\\Repositories\\Script-WindowsScripts\\Refresh Monitors.ps1";
         string fix_windowsupdate = "C:\\Repositories\\Script-WindowsScripts\\Fix Windows Update.ps1";
 
-    
         public MainWindow() {
-            Console.WriteLine("Running...");
-            try {
-                this.InitializeComponent();
-            }
-            catch (Exception e) {
-                Console.WriteLine("Error during execution: " + e.Message);
-            }
+
+            Console.WriteLine("Launching...");
+            this.InitializeComponent();
         }
 
-        // Button Click Script Handler
-        public async Task ButtonScriptClick(Button button, string path, bool opt) {
+        // Button On-Click
+        public bool ButtonClickHandler (Button button) {
 
-            // Change the button state
-            if (button != null) {
+            function_tracker = "ButtonClickHandler";
+            errormessage = string.Empty;
 
-                // Change the button description
-                string buttoncontent = string.Empty;
-                if (button.Content != null) { 
-                    buttoncontent = button.Content as string;
-                    button.Content = "Processing...";
-                }
+            // Just in case
+            if (button == null) {
+                errormessage = "Button is null.";
+                return false;
+            }
+
+            // Change the button description
+            if (button.Content != null) {
+                buttoncontent = button.Content as string;
+                button.Content = "Running...";
                 button.IsEnabled = false;
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        // Button Finish
+        public void ButtonFinishHandler (Button button, bool opt) {
 
-                // Run the script
-                await ExecuteScript(path);
-                if (!string.IsNullOrEmpty(errormessage)) {
-                    button.Content = "Failed";
-                    Debug.WriteLine("Script failed with error: " + errormessage);
-                }
+            // Just in case..
+            if (button.Content != null) {
 
-                // Re-enable the button if the option is on
+                // Re-enable the button if set
                 if (opt) {
                     button.Content = buttoncontent;
                     button.IsEnabled = true;
                 }
+
+                // Set it to greyed finish if not
                 else {
                     button.Content = "Finished";
                 }
-            }
-            else {
-                Debug.WriteLine("Button is null");
             }
             return;
         }
 
         // Run a PowerShell Script
-        private async Task ExecuteScript(string path) {
+        private void ExecutePowershell(string path) {
+
+            scriptrunning = true;
+
+            function_tracker = "ExecutePowershell";
 
             // Make sure the script exists
             if (!File.Exists(path)) {
-                Debug.WriteLine("File does not exist in path: " + path);
+                errormessage = "File does not exist in path: " + path;
                 scriptrunning = false;
                 return;
             }
@@ -93,8 +88,8 @@ namespace Script_Runner
             Debug.WriteLine("Process path set to: " + path);
             startInfo.FileName = "powershell.exe";
             startInfo.Arguments = $"-ExecutionPolicy Unrestricted -File \"{path}\"";
-            startInfo.RedirectStandardOutput = true; // Move output to IOStream
-            startInfo.RedirectStandardError = true; // Move errors to IOStream
+            startInfo.RedirectStandardOutput = false; // Move output to IOStream
+            startInfo.RedirectStandardError = false; // Move errors to IOStream
             startInfo.UseShellExecute = false; // Run from the OS or powershell.exe
             startInfo.CreateNoWindow = false; // Silent
             startInfo.Verb = "runas"; // Run as admin
@@ -103,56 +98,104 @@ namespace Script_Runner
             Debug.WriteLine("Starting the process...");
             try {
                 using (Process process = new Process()) {
-                    
+
                     // Start the process
                     process.StartInfo = startInfo;
                     process.Start();
 
                     // Check if the process is running
                     if (process == null) {
-                        Debug.WriteLine("Process did not start.");
-                        errormessage = "Script failed to start.";
+                        errormessage = "Process did not start.";
+                        scriptrunning = false;
                         return;
                     }
 
-                    // Run the script
-                    Debug.WriteLine("Awaiting async...");
-                    string output = await process.StandardOutput.ReadToEndAsync();
-                    string error = await process.StandardError.ReadToEndAsync();
+                    // Wait for exit
+                    Debug.WriteLine("Awaiting script completion...");
                     process.WaitForExit();
 
                     // Check return state
                     int exitcode = process.ExitCode;
                     if (exitcode != 0) {
-                        Debug.WriteLine("Script failed with the error: " + error);
-                        errormessage = "Script failed.";
+                        errormessage = "Script failed with errorcode " + exitcode + ".";
+                        scriptrunning = false;
                         return;
                     }
 
+                    scriptrunning = false;
                     Debug.WriteLine("Script ran sucessfully");
-                    Debug.WriteLine("Output: " + output);
-                    return;
                 }
             }
             catch (Exception e) {
-                Debug.WriteLine("Script failed with an exception: " + e.Message);
+                errormessage = "Script failed with exception: " + e.Message;
                 scriptrunning = false;
-                return;
             }
             finally {
                 scriptrunning = false;
             }
         }
 
+        // Execute Powershell Commands
+        private void ExecutePowershellCommand(string command) {
+
+            scriptrunning = true;
+
+            var process = new Process();
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = $"{command}";
+            process.StartInfo.Verb = "runas";
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.CreateNoWindow = false;
+
+            process.Start();
+            process.WaitForExit();
+
+            scriptrunning = false;
+        }
+
+        // Execute CMD Commands
+        private void ExecuteCMDCommand (string command) {
+
+            scriptrunning = true;
+
+            var process = new Process();
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = $"/C {command}";
+            process.StartInfo.Verb = "runas";
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.CreateNoWindow = false;
+            try {
+                process.Start();
+                process.WaitForExit();
+                scriptrunning = false;
+            }
+            catch (Exception e) {
+                errormessage = "Command ended with error: " + e;
+                scriptrunning = false;
+            }
+        }
+
         // Button Triggers
-        private async void FixRefreshMonitors(object sender, RoutedEventArgs e) {
+        private void FixRefreshMonitors(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
-            if (!scriptrunning) { await ButtonScriptClick(button, refresh_monitors, true); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonClickHandler(button); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start-Process -FilePath \"DisplaySwitch.exe\" -ArgumentList \"/internal\""); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start-Sleep -Seconds 2"); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershellCommand("Start - Process - FilePath \"DisplaySwitch.exe\" - ArgumentList \"/extend\""); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonFinishHandler(button, true); }
+            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
             return;
         }
-        private async void FixUpdates(object sender, RoutedEventArgs e) {
+        private void FixUpdates(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
-            if (!scriptrunning) { await ButtonScriptClick(button, fix_windowsupdate, false); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonClickHandler(button); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecutePowershell(fix_windowsupdate); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecuteCMDCommand("sfc /scannow"); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ExecuteCMDCommand("DISM /online /cleanup-image /restorehealth"); }
+            if (!scriptrunning && string.IsNullOrEmpty(errormessage)) { ButtonFinishHandler(button, false); }
+            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || "  + errormessage); }
             return;
         }
     }
