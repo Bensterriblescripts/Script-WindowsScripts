@@ -41,7 +41,7 @@ namespace Script_Runner {
             startInfo.RedirectStandardOutput = false; // Move output to IOStream
             startInfo.RedirectStandardError = false; // Move errors to IOStream
             startInfo.UseShellExecute = false; // Run from the OS or powershell.exe
-            startInfo.CreateNoWindow = false; // Silent
+            startInfo.CreateNoWindow = true; // Silent
             startInfo.Verb = "runas"; // Run as admin
 
             Debug.WriteLine("Starting the process...");
