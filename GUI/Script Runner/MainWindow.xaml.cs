@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Script_Runner
 {
@@ -27,15 +28,14 @@ namespace Script_Runner
         }
 
         // Button On-Click
-        private async void ButtonClickHandler (Button button) {
+        private void ButtonClickHandler (Button button) {
             function_tracker = "ButtonClickHandler";
 
-            // Just in case
+            // Error handling
             if (button == null) {
                 errormessage = "Button is null.";
                 return;
             }
-            // Handle simultaneous scripts or errors
             if (scriptrunning) {
                 errormessage = "A script is already running";
                 // Add a 'queue' system here - do not async/overlap
@@ -45,7 +45,7 @@ namespace Script_Runner
                 return;
             }
 
-            // Change the button description
+            // Disable the button
             if (button.Content != null) {
                 buttoncontent = button.Content as string;
                 button.Content = "Running...";
@@ -91,18 +91,25 @@ namespace Script_Runner
         private void FixUpdates(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
             ButtonClickHandler(button);
-            execute.ExecutePowershell(fix_windowsupdate, this);
+            execute.ExecutePowershellScript(fix_windowsupdate, this);
             execute.ExecuteCMDCommand("sfc /scannow", this);
             execute.ExecuteCMDCommand("DISM /online /cleanup-image /restorehealth", this);
-            Debug.WriteLine("Error || " + function_tracker + " || "  + errormessage);
+            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
             ButtonFinishHandler(button, false);
         }
         private void FixRightClick(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
             ButtonClickHandler(button);
-            execute.ExecutePowershell(fix_rightclick, this);
-            Debug.WriteLine("Error || " + function_tracker + " || " + errormessage);
+            execute.ExecutePowershellScript(fix_rightclick, this);
+            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
             ButtonFinishHandler(button, false);
+        }
+
+        // On-Load Button Triggers
+        private void RightClickButtonLoaded(object sender, RoutedEventArgs e) {
+            Button button = sender as Button;
+            execute.ExecutePowershellState("Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'", button, this);
+            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
     }
 }

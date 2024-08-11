@@ -1,4 +1,4 @@
-﻿using Json.Schema;
+﻿using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -7,10 +7,10 @@ namespace Script_Runner {
     public class Execute {
 
         /* PowerShell */
-        public void ExecutePowershell(string path, MainWindow main) {
+        public void ExecutePowershellScript(string path, MainWindow main) {
             main.function_tracker = "ExecutePowershell";
 
-            // Make sure we don't run this over any scripts or errors
+            // Error handling
             if (main.scriptrunning) {
                 main.errormessage = "A script is already running.";
                 return;
@@ -40,7 +40,6 @@ namespace Script_Runner {
             startInfo.CreateNoWindow = false; // Silent
             startInfo.Verb = "runas"; // Run as admin
 
-            // Execute
             Debug.WriteLine("Starting the process...");
             try {
                 using (Process process = new Process()) {
@@ -48,15 +47,11 @@ namespace Script_Runner {
                     // Execute
                     process.StartInfo = startInfo;
                     process.Start();
-
-                    // Check if the process is running
                     if (process == null) {
                         main.errormessage = "Process did not start.";
                         main.scriptrunning = false;
                         return;
                     }
-
-                    // Wait for exit
                     Debug.WriteLine("Awaiting script completion...");
                     process.WaitForExit();
 
@@ -67,7 +62,6 @@ namespace Script_Runner {
                         main.scriptrunning = false;
                         return;
                     }
-
                     main.scriptrunning = false;
                     Debug.WriteLine("Script ran sucessfully");
                 }
@@ -83,8 +77,15 @@ namespace Script_Runner {
         public void ExecutePowershellCommand(string command, MainWindow main) {
             main.function_tracker = "ExecutePowershellCommand";
 
+            // Error handling
+            if (string.IsNullOrEmpty(command)) {
+                main.errormessage = "Command is empty";
+                return;
+            }
+
             main.scriptrunning = true;
 
+            // Build the process
             var process = new Process();
             process.StartInfo.FileName = "powershell.exe";
             process.StartInfo.Arguments = $"{command}";
@@ -93,11 +94,60 @@ namespace Script_Runner {
             process.StartInfo.UseShellExecute = true;
             process.StartInfo.CreateNoWindow = false;
 
+            // Execute
             try {
                 process.Start();
                 process.WaitForExit();
 
                 main.scriptrunning = false;
+            }
+            catch (System.ComponentModel.Win32Exception e) {
+                main.errormessage = "Elevation is required " + e;
+                main.scriptrunning = false;
+            }
+            catch (Exception e) {
+                main.errormessage = "Process error: " + e;
+                main.scriptrunning = false;
+            }
+        }
+        public void ExecutePowershellState(string command, Button button, MainWindow main) {
+            main.function_tracker = "ExecutePowershellState";
+
+            // Error handling
+            if (string.IsNullOrEmpty(command)) {
+                main.errormessage = "Command is empty";
+                return;
+            }
+
+            main.scriptrunning = true;
+
+            // Build the process
+            var process = new Process();
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = $"{command}";
+            process.StartInfo.Verb = "runas";
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = false;
+
+            // Execute
+            try {
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                main.scriptrunning = false;
+
+                // Only set to enabled if true, all other instances are false
+                Debug.WriteLine("Powershell query returned: " + output.Trim());
+                if (output.Trim().Equals("True", StringComparison.OrdinalIgnoreCase)) {
+                    Debug.WriteLine("Button has been set to enabled.");
+                    button.Content = "Enabled"; 
+                }
+                else {
+                    Debug.WriteLine("Button has been set to disabled.");
+                    button.Content = "Disabled";
+                }
             }
             catch (System.ComponentModel.Win32Exception e) {
                 main.errormessage = "Elevation is required " + e;
