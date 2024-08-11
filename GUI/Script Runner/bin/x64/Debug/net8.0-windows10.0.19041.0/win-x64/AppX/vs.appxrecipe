@@ -29,13 +29,13 @@
     <AppXManifest Include="C:\Repositories\Script-WindowsScripts\GUI\Script Runner\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2024-08-11T00:23:23.858</Modified>
+      <Modified>2024-08-11T05:41:55.310</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Repositories\Script-WindowsScripts\GUI\Script Runner\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2024-08-10T23:59:59.969</Modified>
+      <Modified>2024-08-11T04:32:01.525</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Repositories\Script-WindowsScripts\GUI\Script Runner\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\Script Runner.runtimeconfig.json">
       <PackagePath>Script Runner.runtimeconfig.json</PackagePath>
@@ -43,11 +43,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Repositories\Script-WindowsScripts\GUI\Script Runner\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\Script Runner.dll">
       <PackagePath>Script Runner.dll</PackagePath>
-      <Modified>2024-08-11T00:23:23.592</Modified>
+      <Modified>2024-08-11T05:41:55.047</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Repositories\Script-WindowsScripts\GUI\Script Runner\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\apphost.exe">
       <PackagePath>Script Runner.exe</PackagePath>
-      <Modified>2024-08-11T00:23:23.594</Modified>
+      <Modified>2024-08-11T05:41:55.049</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Ben\.nuget\packages\microsoft.powershell.sdk\7.4.4\contentFiles\any\any\ref\Microsoft.CSharp.dll">
       <PackagePath>ref\Microsoft.CSharp.dll</PackagePath>

@@ -8,19 +8,36 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-        <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-            <TextBlock Text="Fix Windows Update" HorizontalAlignment="Center"/>
-            <Button x:Name="fixUpdatesButton" Click="FixUpdates" HorizontalAlignment="Center">Run</Button>
+        <!-- Synchronous Scripts -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+                <TextBlock Text="Fix Windows Update" HorizontalAlignment="Center"/>
+                <Button x:Name="fixUpdatesButton" Click="FixUpdates" HorizontalAlignment="Center">Run</Button>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-            <TextBlock Text="Refresh Monitors" HorizontalAlignment="Center"/>
-            <Button x:Name="fixRefreshMonitorsButton" Click="FixRefreshMonitors" HorizontalAlignment="Center">Start</Button>
+
+        <!-- Toggles -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+                <TextBlock Text="Old Right-Click Menu" HorizontalAlignment="Center"/>
+                <Button x:Name="fixRightClick" Click="FixRightClick" HorizontalAlignment="Center" Loaded="RightClickButtonLoaded">Run</Button>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+                <TextBlock Text="Web Search in the Windows Searchbar" HorizontalAlignment="Center"/>
+                <Button x:Name="fixBingSearch" Click="FixBingSearch" HorizontalAlignment="Center" Loaded="BingSearchButtonLoaded">Run</Button>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
-            <TextBlock Text="Change Right-Click Menu" HorizontalAlignment="Center"/>
-            <Button x:Name="fixRightClick" Click="FixRightClick" HorizontalAlignment="Center" Loaded="RightClickButtonLoaded">Run</Button>
+        
+        <!-- Refresh/Restarts -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
+                <TextBlock Text="Refresh Monitors" HorizontalAlignment="Center"/>
+                <Button x:Name="fixRefreshMonitorsButton" Click="FixRefreshMonitors" HorizontalAlignment="Center">Start</Button>
+            </StackPanel>
         </StackPanel>
+        
     </StackPanel>
+    
 </Window>

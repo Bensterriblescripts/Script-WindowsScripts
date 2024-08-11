@@ -8,14 +8,18 @@ namespace Script_Runner {
 
         /* PowerShell */
         public void ExecutePowershellScript(string path, MainWindow main) {
-            main.function_tracker = "ExecutePowershell";
+            main.function_tracker = "ExecutePowershellScript";
 
             // Error handling
-            if (main.scriptrunning) {
+            if (string.IsNullOrEmpty(path)) {
+                main.errormessage = "Path to script is empty.";
+                return;
+            }
+            else if (main.scriptrunning) {
                 main.errormessage = "A script is already running.";
                 return;
             }
-            else if (string.IsNullOrEmpty(main.errormessage)) {
+            else if (!string.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
@@ -79,7 +83,14 @@ namespace Script_Runner {
 
             // Error handling
             if (string.IsNullOrEmpty(command)) {
-                main.errormessage = "Command is empty";
+                main.errormessage = "The command is empty or null.";
+                return;
+            }
+            else if (main.scriptrunning) {
+                main.errormessage = "A script is already running.";
+                return;
+            }
+            else if (!string.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
@@ -92,7 +103,7 @@ namespace Script_Runner {
             process.StartInfo.Verb = "runas";
             process.StartInfo.RedirectStandardOutput = false;
             process.StartInfo.UseShellExecute = true;
-            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = true;
 
             // Execute
             try {
@@ -115,7 +126,14 @@ namespace Script_Runner {
 
             // Error handling
             if (string.IsNullOrEmpty(command)) {
-                main.errormessage = "Command is empty";
+                main.errormessage = "The command is empty or null.";
+                return;
+            }
+            else if (main.scriptrunning) {
+                main.errormessage = "A script is already running.";
+                return;
+            }
+            else if (!string.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
@@ -128,7 +146,7 @@ namespace Script_Runner {
             process.StartInfo.Verb = "runas";
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = true;
 
             // Execute
             try {
@@ -140,13 +158,15 @@ namespace Script_Runner {
 
                 // Only set to enabled if true, all other instances are false
                 Debug.WriteLine("Powershell query returned: " + output.Trim());
-                if (output.Trim().Equals("True", StringComparison.OrdinalIgnoreCase)) {
-                    Debug.WriteLine("Button has been set to enabled.");
-                    button.Content = "Enabled"; 
+                if (output.Trim().Equals("True", StringComparison.OrdinalIgnoreCase) || output.Trim().Equals("1", StringComparison.OrdinalIgnoreCase)) { // True or 1
+                    Debug.WriteLine("Button " + button.Name + " has been set to enabled.");
+                    button.Content = "Disable";
+                    button.IsEnabled = true;
                 }
                 else {
-                    Debug.WriteLine("Button has been set to disabled.");
-                    button.Content = "Disabled";
+                    Debug.WriteLine("Button " + button.Name + " has been set to disabled.");
+                    button.Content = "Enable";
+                    button.IsEnabled = true;
                 }
             }
             catch (System.ComponentModel.Win32Exception e) {
@@ -164,6 +184,19 @@ namespace Script_Runner {
         public void ExecuteCMDCommand(string command, MainWindow main) {
             main.function_tracker = "ExecuteCMDCommand";
 
+            // Error handling
+            if (string.IsNullOrEmpty(command)) {
+                main.errormessage = "The command is empty or null.";
+                return;
+            }
+            else if (main.scriptrunning) {
+                main.errormessage = "A script is already running.";
+                return;
+            }
+            else if (!string.IsNullOrEmpty(main.errormessage)) {
+                return;
+            }
+
             main.scriptrunning = true;
 
             var process = new Process();
@@ -172,20 +205,23 @@ namespace Script_Runner {
             process.StartInfo.Verb = "runas";
             process.StartInfo.RedirectStandardOutput = false;
             process.StartInfo.UseShellExecute = true;
-            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = true;
             try {
                 process.Start();
                 process.WaitForExit();
 
                 main.scriptrunning = false;
+                main.Activate();
             }
             catch (System.ComponentModel.Win32Exception e) {
                 main.errormessage = "Elevation is required " + e;
                 main.scriptrunning = false;
+                main.Activate();
             }
             catch (Exception e) {
                 main.errormessage = "Command ended with error: " + e;
                 main.scriptrunning = false;
+                main.Activate();
             }
         }
     }
