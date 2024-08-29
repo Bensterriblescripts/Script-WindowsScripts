@@ -12,7 +12,7 @@ namespace Script_Runner {
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        public void BringToFront (MainWindow main) {
+        public static void BringToFront (MainWindow main) {
             main.function_tracker = "BringToFront";
 
             IntPtr hWnd = WindowNative.GetWindowHandle(main);

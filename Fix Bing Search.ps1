@@ -1,6 +1,6 @@
 if (Test-Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -ErrorAction SilentlyContinue) {
     $val = Get-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -ErrorAction SilentlyContinue
-    if ($val -and $val.BingSearchEnabled -eq 0) {
+    if ($val -or $val.BingSearchEnabled -eq 0) {
         Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 1
     }
     elseif ($val -and $val.BingSearchEnabled -eq 1) {

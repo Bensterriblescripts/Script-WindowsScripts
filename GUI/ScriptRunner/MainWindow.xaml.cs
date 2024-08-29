@@ -115,7 +115,7 @@ namespace Script_Runner
             execute.ExecutePowershellState("Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'", button, this);
             
             await Task.Delay(500);
-            func.BringToFront(this);
+            GenericFunctions.BringToFront(this);
             if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
         private async void FixBingSearch(object sender, RoutedEventArgs e) {
@@ -128,7 +128,7 @@ namespace Script_Runner
             execute.ExecutePowershellState("(Get-ItemProperty -Path \"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search\" -Name \"BingSearchEnabled\" -ErrorAction SilentlyContinue).BingSearchEnabled", button, this);
             
             await Task.Delay(500);
-            func.BringToFront(this);
+            GenericFunctions.BringToFront(this);
             if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
 
