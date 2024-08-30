@@ -18,10 +18,10 @@ Set-ItemProperty -Path "$userRegPath\*\shell\SearchCRM\command" -Name "(Default)
 
 # Empty Space
 New-Item -Path "$userRegPath\Directory\Background\shell\SearchCRM" -Force
-Set-ItemProperty -Path "$userRegPath\Directory\Background\shell\SearchCRM" -Name "(Default)" -Value "$menuText clipboard content"
+Set-ItemProperty -Path "$userRegPath\Directory\Background\shell\SearchCRM" -Name "(Default)" -Value "$menuText Clipboard"
 New-Item -Path "$userRegPath\Directory\Background\shell\SearchCRM\command" -Force
 
-$command = "powershell.exe -Command `"& { $cleanTextFunction ; `$clipboardContent = Get-Clipboard -Raw; if (`$clipboardContent) { `$cleanedText = Clean-Text `$clipboardContent; Start-Process '$baseUrl' + [System.Web.HttpUtility]::UrlEncode(`$cleanedText) }}`""
+$command = "powershell.exe -Command `"& { $cleanTextFunction ; `$clipboardContent = Get-Clipboard -Raw; if (`$clipboardContent) { `$cleanedText = Clean-Text `$clipboardContent; Start-Process '$baseUrl' + [System.Web.HttpUtility]::UrlEncode(`$cleanedText) } sleep(2)}`""
 Set-ItemProperty -Path "$userRegPath\Directory\Background\shell\SearchCRM\command" -Name "(Default)" -Value $command
 
 Stop-Process -Name explorer -Force
