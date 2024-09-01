@@ -11,19 +11,19 @@ namespace Script_Runner
 
         // Public Variables
         public bool scriptrunning = false;
-        public string errormessage = string.Empty;
-        public string function_tracker = string.Empty;
+        public string errormessage = String.Empty;
+        public string function_tracker = String.Empty;
         // Variables
-        string buttoncontent = string.Empty;
+        private string buttoncontent = String.Empty;
 
         // Classes
-        Execute execute = new Execute();
-        GenericFunctions func = new GenericFunctions();
+        private readonly Execute execute = new Execute();
+        private GenericFunctions func = new GenericFunctions();
 
         // Script paths
-        string fix_windowsupdate = "C:\\Repositories\\Script-WindowsScripts\\Fix Windows Update.ps1";
-        string fix_rightclick = "C:\\Repositories\\Script-WindowsScripts\\Restore Right-Click Context Menu.ps1";
-        string fix_bingsearch = "C:\\Repositories\\Script-WindowsScripts\\Fix Bing Search.ps1";
+        private const string fix_windowsupdate = @"C:\Repositories\Script-WindowsScripts\Fix Windows Update.ps1";
+        private const string fix_rightclick = @"C:\Repositories\Script-WindowsScripts\Restore Right-Click Context Menu.ps1";
+        private const string fix_bingsearch = @"C:\Repositories\Script-WindowsScripts\Fix Bing Search.ps1";
 
         public MainWindow() {
             Console.WriteLine("Launching...");
@@ -44,7 +44,7 @@ namespace Script_Runner
                 // Add a 'queue' system here - do not async/overlap
                 return;
             }
-            else if (!string.IsNullOrEmpty(errormessage)) {
+            else if (!String.IsNullOrEmpty(errormessage)) {
                 return;
             }
 
@@ -62,15 +62,15 @@ namespace Script_Runner
             if (button.Content != null) {
 
                 // Re-enables button and replace button text
-                if (opt && string.IsNullOrEmpty(errormessage)) {
+                if (opt && String.IsNullOrEmpty(errormessage)) {
                     button.IsEnabled = true;
                     button.Content = "Run Again";
                 }
-                else if (opt && !string.IsNullOrEmpty(errormessage)) {
+                else if (opt && !String.IsNullOrEmpty(errormessage)) {
                     button.IsEnabled = true;
                     button.Content = "Retry";
                 }
-                else if (string.IsNullOrEmpty(errormessage)) {
+                else if (String.IsNullOrEmpty(errormessage)) {
                     button.Content = "Finished";
                 }
                 else { 
@@ -78,7 +78,7 @@ namespace Script_Runner
                 }
             }
 
-            errormessage = string.Empty;
+            errormessage = String.Empty;
         }
 
         // Buttons
@@ -90,7 +90,7 @@ namespace Script_Runner
             execute.ExecutePowershellCommand("Start-Process -FilePath \"DisplaySwitch.exe\" -ArgumentList \"/internal\"", this);
             execute.ExecutePowershellCommand("Start-Sleep -Seconds 2", this);
             execute.ExecutePowershellCommand("Start-Process -FilePath \"DisplaySwitch.exe\" -ArgumentList \"/extend\"", this);
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
+            if (!String.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
             ButtonFinishHandler(button, true);
         }
         private async void FixUpdates(object sender, RoutedEventArgs e) {
@@ -101,9 +101,17 @@ namespace Script_Runner
             execute.ExecutePowershellScript(fix_windowsupdate, this);
             execute.ExecuteCMDCommand("sfc /scannow", this);
             execute.ExecuteCMDCommand("DISM /online /cleanup-image /restorehealth", this);
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
+            if (!String.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
             ButtonFinishHandler(button, false);
         }
+        private async void ContextMenu_CRMSearch(object sender, RoutedEventArgs e) {
+            Button button = sender as Button;
+            ButtonClickHandler(button);
+            await Task.Delay(500);
+
+            ContextMenu.CreateMenu(true);
+            ButtonFinishHandler(button, false);
+        } 
 
         // Hot-Reload Buttons
         private async void FixRightClick(object sender, RoutedEventArgs e) {
@@ -112,11 +120,11 @@ namespace Script_Runner
             await Task.Delay(500);
 
             execute.ExecutePowershellScript(fix_rightclick, this);
-            execute.ExecutePowershellState("Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'", button, this);
+            execute.ExecutePowershellState(@"Test-Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'", button, this);
             
             await Task.Delay(500);
             GenericFunctions.BringToFront(this);
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
+            if (!String.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
         private async void FixBingSearch(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
@@ -129,23 +137,23 @@ namespace Script_Runner
             
             await Task.Delay(500);
             GenericFunctions.BringToFront(this);
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
+            if (!String.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
 
         // On-Load Buttons
         private async void RightClickButtonLoaded(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
-            execute.ExecutePowershellState("Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'", button, this);
+            execute.ExecutePowershellState(@"Test-Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'", button, this);
             
             await Task.Delay(500);
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
+            if (!String.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
         private async void BingSearchButtonLoaded(object sender, RoutedEventArgs e) {
             Button button = sender as Button;
             execute.ExecutePowershellState("(Get-ItemProperty -Path \"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search\" -Name \"BingSearchEnabled\" -ErrorAction SilentlyContinue).BingSearchEnabled", button, this);
 
             await Task.Delay(500);
-            if (!string.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
+            if (!String.IsNullOrEmpty(errormessage)) { Debug.WriteLine("Error || " + function_tracker + " || " + errormessage); }
         }
     }
 }

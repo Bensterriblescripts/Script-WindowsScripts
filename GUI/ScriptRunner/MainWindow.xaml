@@ -3,7 +3,6 @@
     x:Class="Script_Runner.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Script_Runner"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -14,8 +13,12 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
                 <TextBlock Text="Fix Windows Update" HorizontalAlignment="Center"/>
-                <Button x:Name="fixUpdatesButton" Click="FixUpdates" HorizontalAlignment="Center">Run</Button>
+                <Button Click="FixUpdates" HorizontalAlignment="Center">Run</Button>
             </StackPanel>
+            <!-- <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center"> -->
+            <!--     <TextBlock Text="Add 'Search with CRM' to right-click menu" HorizontalAlignment="Center"/> -->
+            <!--     <Button Click="ContextMenu_CRMSearch" HorizontalAlignment="Center">Run</Button> -->
+            <!-- </StackPanel> -->
         </StackPanel>
 
         <!-- Toggles -->
@@ -26,7 +29,7 @@
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
                 <TextBlock Text="Web Search in the Windows Searchbar" HorizontalAlignment="Center"/>
-                <Button x:Name="fixBingSearch" Click="FixBingSearch" HorizontalAlignment="Center" Loaded="BingSearchButtonLoaded">Run</Button>
+                <Button Click="FixBingSearch" HorizontalAlignment="Center" Loaded="BingSearchButtonLoaded">Run</Button>
             </StackPanel>
         </StackPanel>
         
@@ -34,7 +37,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center">
                 <TextBlock Text="Refresh Monitors" HorizontalAlignment="Center"/>
-                <Button x:Name="fixRefreshMonitorsButton" Click="FixRefreshMonitors" HorizontalAlignment="Center">Start</Button>
+                <Button Click="FixRefreshMonitors" HorizontalAlignment="Center">Start</Button>
             </StackPanel>
         </StackPanel>
         

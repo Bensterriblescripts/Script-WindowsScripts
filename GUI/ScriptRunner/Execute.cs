@@ -11,7 +11,7 @@ namespace Script_Runner {
             main.function_tracker = "ExecutePowershellScript";
 
             // Error handling
-            if (string.IsNullOrEmpty(path)) {
+            if (String.IsNullOrEmpty(path)) {
                 main.errormessage = "Path to script is empty.";
                 return;
             }
@@ -19,7 +19,7 @@ namespace Script_Runner {
                 main.errormessage = "A script is already running.";
                 return;
             }
-            else if (!string.IsNullOrEmpty(main.errormessage)) {
+            else if (!String.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
@@ -82,7 +82,7 @@ namespace Script_Runner {
             main.function_tracker = "ExecutePowershellCommand";
 
             // Error handling
-            if (string.IsNullOrEmpty(command)) {
+            if (String.IsNullOrEmpty(command)) {
                 main.errormessage = "The command is empty or null.";
                 return;
             }
@@ -90,7 +90,7 @@ namespace Script_Runner {
                 main.errormessage = "A script is already running.";
                 return;
             }
-            else if (!string.IsNullOrEmpty(main.errormessage)) {
+            else if (!String.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
@@ -125,7 +125,7 @@ namespace Script_Runner {
             main.function_tracker = "ExecutePowershellState";
 
             // Error handling
-            if (string.IsNullOrEmpty(command)) {
+            if (String.IsNullOrEmpty(command)) {
                 main.errormessage = "The command is empty or null.";
                 return;
             }
@@ -133,7 +133,7 @@ namespace Script_Runner {
                 main.errormessage = "A script is already running.";
                 return;
             }
-            else if (!string.IsNullOrEmpty(main.errormessage)) {
+            else if (!String.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
@@ -185,7 +185,7 @@ namespace Script_Runner {
             main.function_tracker = "ExecuteCMDCommand";
 
             // Error handling
-            if (string.IsNullOrEmpty(command)) {
+            if (String.IsNullOrEmpty(command)) {
                 main.errormessage = "The command is empty or null.";
                 return;
             }
@@ -193,7 +193,7 @@ namespace Script_Runner {
                 main.errormessage = "A script is already running.";
                 return;
             }
-            else if (!string.IsNullOrEmpty(main.errormessage)) {
+            else if (!String.IsNullOrEmpty(main.errormessage)) {
                 return;
             }
 
