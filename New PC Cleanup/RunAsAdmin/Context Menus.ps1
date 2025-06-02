@@ -1,9 +1,3 @@
-# Turn Off Hibernation
-powercfg -h off
-
-
-## Context Menus
-
 # Remove Home from File Explorer
 New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" -Name "HiddenByDefault" -Value 1 -PropertyType DWord
 
@@ -27,6 +21,9 @@ New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\
 
 # Remove Restore Previous Versions
 New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" -Name "{596AB062-B4D2-4215-9F74-E9109B0A8153}" -Value '' -PropertyType String -Force
+
+
+
 
 # Potential Locations
 # HKEY_CLASSES_ROOT\AllFilesystemObjects\shellex\ContextMenuHandlers\
