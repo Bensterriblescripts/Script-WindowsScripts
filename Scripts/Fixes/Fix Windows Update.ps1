@@ -107,11 +107,7 @@ Write-Host "Forcing Discovery..."
 Start-Process wuauclt -ArgumentList "/resetauthorization /detectnow" -Wait -NoNewWindow -PassThru
 
 # Scan for corrupted files
-# Write-Host "Scanning for corrupted files..."
-# $sfc_result = Start-Process "cmd.exe" -ArgumentList "/c sfc /scannow" -WindowStyle Hidden -Wait
-# if (!$sfc_result.Contains("Windows Resource Protection did not find any integrity violations.")) {
-#     # Cleanup the windows image
-#     Write-Host "Corrupted files found."
-#     Write-Host "Restoring Windows Image..."
-#     Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /restorehealth" -WindowStyle Hidden -Wait
-# }
+Write-Host "Refreshing the windows update image..."
+Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /restorehealth" -WindowStyle Hidden -Wait
+Write-Host "Scanning for corrupted files..."
+Start-Process "cmd.exe" -ArgumentList "/c sfc /scannow" -WindowStyle Hidden -Wait
