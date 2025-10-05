@@ -1,0 +1,3 @@
+bcdedit /set "{20e7bd89-a16d-11f0-b593-aab944aa0795}" description "Gaming"
+# or
+bcdedit /set "{current}" description "Development"
