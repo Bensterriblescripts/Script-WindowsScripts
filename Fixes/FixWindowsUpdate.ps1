@@ -36,7 +36,7 @@ else {
 }
 
 # Stop update services
-$Services = @("BITS","wuauserv","appidsvc","cryptsvc")
+$Services = @("BITS","wuauserv","appidsvc","cryptsvc", "msiserver")
 ForEach ($Service in $Services) {
     Write-Host "Stopping Service: " -NoNewline
     Write-Host "$($Service)" -ForegroundColor Green
@@ -106,8 +106,16 @@ ForEach ($Service in $Services) {
 Write-Host "Forcing Discovery..."
 Start-Process wuauclt -ArgumentList "/resetauthorization /detectnow" -Wait -NoNewWindow -PassThru
 
-# Scan for corrupted files
-Write-Host "Refreshing the windows update image..."
-Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /restorehealth" -WindowStyle Hidden -Wait
+clear
+
+# Scan for any errors after retrieving the new image
 Write-Host "Scanning for corrupted files..."
 Start-Process "cmd.exe" -ArgumentList "/c sfc /scannow" -WindowStyle Hidden -Wait
+# Refresh the windows update image
+Write-Host "-- Refreshing the windows update image..."
+Write-Host "Checking image health..."
+Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /checkhealth" -WindowStyle Hidden -Wait
+Write-Host "Scanning image health..."
+Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /scanhealth" -WindowStyle Hidden -Wait
+Write-Host "Restoring image health..."
+Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /restorehealth" -WindowStyle Hidden -Wait
