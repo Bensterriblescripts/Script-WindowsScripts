@@ -1,5 +1,5 @@
 # # # Created by Ben
-# # # Based on the batch version: https://answers.microsoft.com/en-us/windows/forum/all/how-toreset-windows-update-components-in-windows/14b86efd-1420-4916-9832-829125b1e8a3
+#  Based on the batch version: https://answers.microsoft.com/en-us/windows/forum/all/how-toreset-windows-update-components-in-windows/14b86efd-1420-4916-9832-829125b1e8a3
 
 $ErrorActionPreference = "SilentlyContinue"
 # Clear settings visibility (sometimes hides options)
@@ -36,7 +36,7 @@ else {
 }
 
 # Stop update services
-$Services = @("BITS","wuauserv","appidsvc","cryptsvc", "msiserver")
+$Services = @("BITS","wuauserv","appidsvc","cryptsvc", "msiserver", "usosvc", "waasmedicsvc", "dosvc")
 ForEach ($Service in $Services) {
     Write-Host "Stopping Service: " -NoNewline
     Write-Host "$($Service)" -ForegroundColor Green
@@ -87,6 +87,7 @@ Write-Host "Removing Windows Update RegKeys"
 Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name AccountDomainSid | Out-Null
 Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name PingID | Out-Null
 Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name SusClientId | Out-Null
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate" -Name SusClientIdValidation -ErrorAction SilentlyContinue
 
 # Reset the windows sockets api
 Write-Host "Resetting the WinSock..."
@@ -104,18 +105,21 @@ ForEach ($Service in $Services) {
 
 # Enable update discovery again
 Write-Host "Forcing Discovery..."
-Start-Process wuauclt -ArgumentList "/resetauthorization /detectnow" -Wait -NoNewWindow -PassThru
+Start-Process usoclient -ArgumentList "StartScan" -Wait -NoNewWindow -PassThru
+
+# Install .NET Framework 3.5 - Update issue on 24H2 systems
+Write-Host "`nInstalling the .NET Framework (3.5)"
+# Enable-WindowsOptionalFeature -Online -FeatureName NetFx3 -NoRestart
+DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
+Write-Host "`nEnabling the .NET Framework (3.5)"
+DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
 
 clear
 
 # Scan for any errors after retrieving the new image
 Write-Host "Scanning for corrupted files..."
-Start-Process "cmd.exe" -ArgumentList "/c sfc /scannow" -WindowStyle Hidden -Wait
+sfc /scannow
+
 # Refresh the windows update image
-Write-Host "-- Refreshing the windows update image..."
-Write-Host "Checking image health..."
-Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /checkhealth" -WindowStyle Hidden -Wait
-Write-Host "Scanning image health..."
-Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /scanhealth" -WindowStyle Hidden -Wait
-Write-Host "Restoring image health..."
-Start-Process "cmd.exe" -ArgumentList "/c DISM /online /cleanup-image /restorehealth" -WindowStyle Hidden -Wait
+Write-Host "`nRestoring image health..."
+DISM /online /cleanup-image /restorehealth
