@@ -58,6 +58,58 @@ if (Get-Item -Path $env:systemroot\system32\catroot2.bak) {
 }
 Rename-Item $env:systemroot\System32\Catroot2 catroot2.bak -ErrorAction SilentlyContinue
 
+# Clear Component Store Cache
+Write-Host "Clearing Component Store cache..."
+DISM /Online /Cleanup-Image /StartComponentCleanup /ResetBase
+
+# Delete pending.xml
+Write-Host "Removing pending.xml if it exists..."
+if (Test-Path "$env:systemroot\WinSxS\pending.xml") {
+    takeown /f "$env:systemroot\WinSxS\pending.xml"
+    icacls "$env:systemroot\WinSxS\pending.xml" /grant administrators:F
+    Remove-Item "$env:systemroot\WinSxS\pending.xml" -Force -ErrorAction SilentlyContinue
+}
+
+# Clear (potentially) locked CBS Logs
+Write-Host "Clearing CBS logs..."
+if (Test-Path "$env:systemroot\Logs\CBS\CBS.log") {
+    Remove-Item "$env:systemroot\Logs\CBS\*.log" -Force -ErrorAction SilentlyContinue
+}
+# Clear CBS Sessions folder (different from logs)
+Write-Host "Clearing CBS Sessions..."
+if (Test-Path "$env:systemroot\servicing\Sessions") {
+    takeown /f "$env:systemroot\servicing\Sessions" /r /d y
+    icacls "$env:systemroot\servicing\Sessions" /grant administrators:F /t
+    Remove-Item "$env:systemroot\servicing\Sessions\*" -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+# Fix Windows Update service registry corruption
+Write-Host "Repairing Windows Update service registry..."
+$wuRegPath = "HKLM:\SYSTEM\CurrentControlSet\Services\wuauserv"
+if (Test-Path $wuRegPath) {
+    Set-ItemProperty -Path $wuRegPath -Name Start -Value 3 -Force
+    Set-ItemProperty -Path $wuRegPath -Name Type -Value 32 -Force -ErrorAction SilentlyContinue
+}
+
+# Repair WSUS Registries
+Write-Host "Removing WSUS server configuration..."
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name WUServer -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name WUStatusServer -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name UseWUServer -ErrorAction SilentlyContinue
+
+# Perform Group Policy Update
+Write-Host "Clearing Group Policy cache..."
+Remove-Item "$env:systemroot\System32\GroupPolicy\Machine\Registry.pol" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:systemroot\System32\GroupPolicy\User\Registry.pol" -Force -ErrorAction SilentlyContinue
+echo N | gpupdate /force
+
+
+# Clear DataStore and Download Folders
+Write-Host "Clearing SoftwareDistribution subfolders..."
+Remove-Item "$env:systemroot\SoftwareDistribution\DataStore\*" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:systemroot\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue
+
+
 # Clear the previous update log
 Write-Host "Removing old Windows Update log..."
 if (Get-Item -Path $env:systemroot\WindowsUpdate.log) { 
@@ -109,17 +161,41 @@ Start-Process usoclient -ArgumentList "StartScan" -Wait -NoNewWindow -PassThru
 
 # Install .NET Framework 3.5 - Update issue on 24H2 systems
 Write-Host "`nInstalling the .NET Framework (3.5)"
-# Enable-WindowsOptionalFeature -Online -FeatureName NetFx3 -NoRestart
 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
-Write-Host "`nEnabling the .NET Framework (3.5)"
-DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
-
-clear
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Retrying .NET 3.5 with Windows Update as source..."
+    DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /LimitAccess:false
+}
 
 # Scan for any errors after retrieving the new image
-Write-Host "Scanning for corrupted files..."
+Write-Host "`nScanning for corrupted files..."
+$rerun = $false
 sfc /scannow
+$LASTEXITCODE = 0
+if ($LASTEXITCODE -eq 2) {
+    Write-Host "SFC: Found corrupted files but couldn't repair them. Adding another sfc after the DISM..." -ForegroundColor Red
+    $rerun = $true
+}
+
+# Add corrupted packages
+Write-Host "Checking for corrupt packages..."
+DISM /Online /Get-Packages | Select-String "Install Pending|Staged|Superseded"
 
 # Refresh the windows update image
 Write-Host "`nRestoring image health..."
-DISM /online /cleanup-image /restorehealth
+DISM /Online /Cleanup-Image /RestoreHealth
+# If that failed, update source
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Retrying with explicit Windows Update source..."
+    DISM /Online /Cleanup-Image /RestoreHealth /Source:WU
+}
+
+# If the last SFC failed, run it again.
+if ($rerun) {
+    sfc /scannow
+    if ($LASTEXITCODE -eq 2) {
+        Write-Host "SFC: Found corrupted files but couldn't repair them." -ForegroundColor Red
+    }
+}
+
+Restart-Computer -Force
