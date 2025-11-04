@@ -1,12 +1,14 @@
 Mount the windows image
 
-&'C:\Users\Ben\Downloads\tiny11.ps1' -ISO E -SCRATCH C
+&'C:\Users\Ben\Downloads\tiny11.ps1' -ISO E
 E is the iso image mount letter
-C is obvious
 
-Write the image using rufus and set any up any local account settings
+Write the image using rufus and set any up any bypasses here
+Do not set up local account (bypass microsoft account is fine)
 
-After installing, do not install the internet drivers and pase windows update.
+During the installation, after the keyboard has been chosen run start ms-cxh:localonly
+
+After installing, pause windows update.
 
 Install drivers
 
@@ -16,6 +18,10 @@ https://github.com/Bensterriblescripts/Script-WindowsScripts
 Run the scripts you want
 
 Restart
+
+Fin
+
+
 
 
 DISABLING DRIVER INSTALLATION VIA WINDOWS UPDATE: 
