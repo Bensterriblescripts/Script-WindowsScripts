@@ -398,6 +398,21 @@ Remove-Item -Path "$tasksPath\Microsoft\Windows\Chkdsk\Proxy" -Force -ErrorActio
 # Windows Error Reporting (QueueReporting)
 Remove-Item -Path "$tasksPath\Microsoft\Windows\Windows Error Reporting\QueueReporting" -Force -ErrorAction SilentlyContinue
 Write-Host "Task files have been deleted."
+
+# Disable defender
+Write-Output "Removing defender..."
+$servicePaths = @(
+    "WinDefend",
+    "WdNisSvc",
+    "WdNisDrv",
+    "WdFilter",
+    "Sense"
+)
+foreach ($path in $servicePaths) {
+    Set-ItemProperty -Path "HKLM:\zSYSTEM\ControlSet001\Services\$path" -Name "Start" -Value 4
+}
+& 'reg' 'add' 'HKLM\zSYSTEM\CurrentControlSet\Services\WinDefend' '/v' 'DependOnService' '/t' 'REG_MULTI_SZ' '/d' 'RpcSs-DISABLED' '/f'
+
 Write-Host "Unmounting Registry..."
 reg unload HKLM\zCOMPONENTS | Out-Null
 reg unload HKLM\zDEFAULT | Out-Null
