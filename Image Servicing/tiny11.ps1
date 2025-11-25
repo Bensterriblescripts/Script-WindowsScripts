@@ -249,7 +249,7 @@ $packagePrefixes = 'AppUp.IntelManagementandSecurityStatus',
 
 $packagesToRemove = $packages | Where-Object {
     $packageName = $_
-    $packagePrefixes -contains ($packagePrefixes | Where-Object { $packageName -like "*$_*" })
+    $packagePrefixes | Where-Object { $packageName -like "*$_*" } | ForEach-Object { return $true }
 }
 foreach ($package in $packagesToRemove) {
     & 'dism' '/English' "/image:$($ScratchDisk)\scratchdir" '/Remove-ProvisionedAppxPackage' "/PackageName:$package"
@@ -259,7 +259,7 @@ Write-Host "Removing of system apps complete! Now proceeding to removal of syste
 Start-Sleep -Seconds 1
 Clear-Host
 
-$scratchDir = "$($env:SystemDrive)\scratchdir"
+$scratchDir = "$ScratchDisk\scratchdir"
 $packagePatterns = @(
     "Microsoft-Windows-InternetExplorer-Optional-Package~31bf3856ad364e35",
     "Microsoft-Windows-LanguageFeatures-Handwriting-$languageCode-Package~31bf3856ad364e35",
@@ -342,13 +342,12 @@ Set-RegistryValue 'HKLM\zSOFTWARE\Policies\Microsoft\Windows\CloudContent' 'Disa
 
 Write-Output "Disabling Reserved Storage:"
 Set-RegistryValue 'HKLM\zSOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager' 'ShippedWithReserves' 'REG_DWORD' '0'
+Set-RegistryValue 'HKLM\zSOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager' 'MiscPolicyInfo' 'REG_DWORD' '2'
+Set-RegistryValue 'HKLM\zSOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager' 'PassedPolicy' 'REG_DWORD' '0'
+
 
 Write-Output "Disabling BitLocker Device Encryption"
 Set-RegistryValue 'HKLM\zSYSTEM\ControlSet001\Control\BitLocker' 'PreventDeviceEncryption' 'REG_DWORD' '1'
-
-Write-Output "Disabling Chat icon:"
-Set-RegistryValue 'HKLM\zSOFTWARE\Policies\Microsoft\Windows\Windows Chat' 'ChatIcon' 'REG_DWORD' '3'
-Set-RegistryValue 'HKLM\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced' 'TaskbarMn' 'REG_DWORD' '0'
 
 Write-Output "Disabling OneDrive folder backup"
 Set-RegistryValue "HKLM\zSOFTWARE\Policies\Microsoft\Windows\OneDrive" "DisableFileSyncNGSC" "REG_DWORD" "1"
@@ -432,32 +431,6 @@ Rename-Item -Path "$ScratchDisk\tiny11\sources\install2.wim" -NewName "install.w
 Write-Output "Windows image completed. Continuing with boot.wim."
 Start-Sleep -Seconds 2
 Clear-Host
-Write-Output "Mounting boot image:"
-$wimFilePath = "$ScratchDisk\tiny11\sources\boot.wim"
-& takeown "/F" $wimFilePath | Out-Null
-& icacls $wimFilePath "/grant" "$($adminGroup.Value):(F)"
-Set-ItemProperty -Path $wimFilePath -Name IsReadOnly -Value $false
-Mount-WindowsImage -ImagePath $ScratchDisk\tiny11\sources\boot.wim -Index 2 -Path $ScratchDisk\scratchdir
-Write-Output "Loading registry..."
-reg load HKLM\zCOMPONENTS $ScratchDisk\scratchdir\Windows\System32\config\COMPONENTS
-reg load HKLM\zDEFAULT $ScratchDisk\scratchdir\Windows\System32\config\default
-reg load HKLM\zNTUSER $ScratchDisk\scratchdir\Users\Default\ntuser.dat
-reg load HKLM\zSOFTWARE $ScratchDisk\scratchdir\Windows\System32\config\SOFTWARE
-reg load HKLM\zSYSTEM $ScratchDisk\scratchdir\Windows\System32\config\SYSTEM
-Write-Output "Tweaking complete!"
-
-Write-Output "Unmounting Registry..."
-reg unload HKLM\zCOMPONENTS | Out-Null
-reg unload HKLM\zDEFAULT | Out-Null
-reg unload HKLM\zNTUSER | Out-Null
-reg unload HKLM\zSOFTWARE | Out-Null
-reg unload HKLM\zSYSTEM | Out-Null
-
-Write-Output "Unmounting image..."
-Dismount-WindowsImage -Path $ScratchDisk\scratchdir -Save
-Clear-Host
-Write-Output "The tiny11 image is now completed. Proceeding with the making of the ISO..."
-Write-Output "Copying unattended file for bypassing MS account on OOBE..."
 Write-Output "Creating ISO image..."
 $ADKDepTools = "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\$hostarchitecture\Oscdimg"
 $localOSCDIMGPath = "$PSScriptRoot\oscdimg.exe"
