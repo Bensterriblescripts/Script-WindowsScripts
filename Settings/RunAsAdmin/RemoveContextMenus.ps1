@@ -20,6 +20,7 @@ New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\
 
 # Visual Studio
 Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\AnyCode"
+Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell\AnyCode"
 
 # Encryption Menu
 Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers\EncryptionMenu"
