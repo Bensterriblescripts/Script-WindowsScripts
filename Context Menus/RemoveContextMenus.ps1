@@ -1,4 +1,6 @@
-## Most often want these
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',('"{0}"'-f$PSCommandPath); exit
+}
 
 # Pin to Quick Access - Recycle Bin
 New-Item -Path "Registry::HKEY_CLASSES_ROOT\Folder\shell\pintohome" -Force
