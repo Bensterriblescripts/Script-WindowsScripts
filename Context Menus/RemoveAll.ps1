@@ -7,8 +7,8 @@ New-Item -Path "Registry::HKEY_CLASSES_ROOT\Folder\shell\pintohome" -Force
 New-ItemProperty -Path "Registry::HKEY_CLASSES_ROOT\Folder\shell\pintohome" -Name "AppliesTo" -Value 'NOT System.ParsingName:=\"::{645FF040-5081-101B-9F08-00AA002F954E}\"' -PropertyType String -Force
 
 # Pin to Start - Folders 
-Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Folder\ShellEx\ContextMenuHandlers\pintostart"
-Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\{a2a9545d-a0c2-42b4-9708-a0b2badd77c8}" -Force
+#Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Folder\ShellEx\ContextMenuHandlers\pintostart"
+#Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\{a2a9545d-a0c2-42b4-9708-a0b2badd77c8}" -Force
 # Pin to Home - Folders
 Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Folder\shell\pintohome"
 Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\*\shell\pintohomefile"
@@ -38,16 +38,5 @@ Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\*\shelle
 # Open in new tab
 Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\shell\opennewtab"
 
-# LIbrary
+# Library
 Remove-Item -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\ShellEx\ContextMenuHandlers\Library Location"
-
-
-
-
-
-
-# Potential Locations
-# HKEY_CLASSES_ROOT\AllFilesystemObjects\shellex\ContextMenuHandlers\
-# HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved
-# Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex
-# Also try: Easy Context Menu software
