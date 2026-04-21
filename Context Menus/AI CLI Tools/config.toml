@@ -1,0 +1,11 @@
+approval_policy = "never"
+network_access = "enabled"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "danger-full-access"
+personality = "none"
+suppress_unstable_features_warning = true
+
+[windows]
+sandbox = "elevated"
+

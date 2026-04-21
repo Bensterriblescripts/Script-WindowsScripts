@@ -1,0 +1,45 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Search",
+      "WebFetch",
+      "WebSearch",
+      "Bash(curl:*)",
+      "Read(**)",
+      "Edit(**)",
+      "Write(**)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(sleep:*)",
+      "Bash(mkdir:*)",
+      "Bash(dir:*)",
+      "Bash(cd:*)",
+      "Bash(sed:*)",
+      "Bash(pandoc:*)",
+      "Bash(winget install:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(go:*)",
+      "Bash(cargo:*)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
+  },
+  "spinnerTipsEnabled": false,
+  "companyAnnouncements": [
+    "Licensed to MITO Limited - ⚠️ PLEASE BACK UP EVERYTHING BEFORE INVOKING ANY REQUESTS ⚠️"
+  ]
+}
