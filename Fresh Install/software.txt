@@ -1,0 +1,16 @@
+# Run Standalone First
+winget install --id Microsoft.VisualStudio.Community -e
+Start-Process "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" -Wait
+
+# Development Tools
+winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
+winget install --id Gyan.FFmpeg -e --accept-source-agreements --accept-package-agreements
+winget install --id Microsoft.VisualStudioCode -e --accept-source-agreements --accept-package-agreements
+winget install --id GitHub.GitHubDesktop -e --accept-source-agreements --accept-package-agreements
+
+# Languages
+winget install --id Python.Python.3.12 -e --accept-source-agreements --accept-package-agreements
+
+# Jellyfin - Launch the tray icon once in Progam Files/Jellyfin/windows-tray-icon
+#winget install --id Jellyfin.Server -e --accept-source-agreements --accept-package-agreements
+winget install --id Jellyfin.JellyfinMediaPlayer -e --accept-source-agreements --accept-package-agreements
