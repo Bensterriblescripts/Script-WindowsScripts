@@ -1,0 +1,15 @@
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',('"{0}"'-f$PSCommandPath); exit
+}
+
+# Remove Git context menus from directories
+Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Directory\shell\git_gui" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Directory\shell\git_shell" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Remove Git context menus from directory background right-click
+Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Directory\Background\shell\git_gui" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Directory\Background\shell\git_shell" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Remove Git context menus from drives
+Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Drive\shell\git_gui" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "Registry::HKEY_CLASSES_ROOT\Drive\shell\git_shell" -Recurse -Force -ErrorAction SilentlyContinue
