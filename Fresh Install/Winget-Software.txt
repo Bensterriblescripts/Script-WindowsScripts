@@ -26,3 +26,4 @@ winget install --id Jellyfin.JellyfinMediaPlayer -e --accept-source-agreements -
 
 # Extras
 winget install -e --id Vivaldi.Vivaldi --accept-source-agreements --accept-package-agreements
+winget install -e --id VideoLAN.VLC --accept-source-agreements --accept-package-agreements
