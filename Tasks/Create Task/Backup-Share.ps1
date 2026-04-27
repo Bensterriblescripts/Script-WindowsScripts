@@ -18,8 +18,8 @@ $Action = New-ScheduledTaskAction `
     -WorkingDirectory $TaskFolder
 $Trigger = New-ScheduledTaskTrigger `
     -Weekly `
-    -DaysOfWeek Friday `
-    -At 11:00AM
+    -DaysOfWeek Tuesday `
+    -At 1:00AM
 $CurrentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 $Principal = New-ScheduledTaskPrincipal `
     -UserId $CurrentUser `
