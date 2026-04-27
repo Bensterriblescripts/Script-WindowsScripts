@@ -1,6 +1,6 @@
 $TaskFolder = "C:\Tasks"
-$ScriptPath = Join-Path $TaskFolder "Backup-Share.cmd"
-$TaskName = "Backup Share Folder"
+$ScriptPath = Join-Path $TaskFolder "Backup-VM.cmd"
+$TaskName = "Backup VMs"
 
 # Create task/script folder
 if (-not (Test-Path $TaskFolder)) {
@@ -8,7 +8,7 @@ if (-not (Test-Path $TaskFolder)) {
 }
 
 $ScriptContent = @'
-robocopy "C:\Users\Administrator\.vm" "D:\VM" /E /COPY:DAT /DCOPY:DAT /R:3 /W:2 /MT:8 /TEE /LOG+:"C:\Tasks\Backup-Share.log" /NJH /NP /XJ
+robocopy "C:\Users\Administrator\.vm" "D:\VM" /E /COPY:DAT /DCOPY:DAT /R:3 /W:2 /MT:8 /TEE /LOG+:"C:\Tasks\Backup-VM.log" /NJH /NP /XJ
 '@
 $ScriptContent | Out-File -FilePath $ScriptPath -Encoding ASCII -Force # Use ASCII, CMD doeesn't like the powershell formatting
 
@@ -45,7 +45,7 @@ Register-ScheduledTask `
     -Trigger $Trigger `
     -Principal $Principal `
     -Settings $Settings `
-    -Description "Runs Backup-Share.cmd from $TaskFolder"
+    -Description "Runs Backup-VM.cmd from $TaskFolder"
 
 Write-Host "Scheduled task created: $TaskName"
 Write-Host "Command file: $ScriptPath"
