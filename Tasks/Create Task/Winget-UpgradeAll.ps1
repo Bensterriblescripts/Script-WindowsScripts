@@ -3,12 +3,10 @@ $ScriptPath = Join-Path $TaskFolder "Winget-UpgradeAll.ps1"
 $LogPath = Join-Path $TaskFolder "Winget-UpgradeAll.log"
 $TaskName = "Upgrade All Packages"
 
-# Create task/script folder
 if (-not (Test-Path $TaskFolder)) {
     New-Item -Path $TaskFolder -ItemType Directory -Force | Out-Null
 }
 
-# Script content to be written to disk
 $ScriptContent = @'
 $Log = "C:\Tasks\Winget-UpgradeAll.log"
 $ErrorActionPreference = "Stop"
@@ -81,7 +79,6 @@ catch {
 }
 '@
 $ScriptContent | Out-File -FilePath $ScriptPath -Encoding UTF8 -Force
-
 $Action = New-ScheduledTaskAction `
     -Execute "powershell.exe" `
     -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptPath`""
@@ -103,6 +100,7 @@ $Settings = New-ScheduledTaskSettingsSet `
     -ExecutionTimeLimit (New-TimeSpan -Hours 4) `
     -MultipleInstances IgnoreNew `
     -RunOnlyIfNetworkAvailable
+
 
 $ExistingTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
 if ($ExistingTask) {
