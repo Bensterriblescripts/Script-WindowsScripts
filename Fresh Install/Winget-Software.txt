@@ -12,7 +12,11 @@ winget install --id GitHub.GitHubDesktop -e --accept-source-agreements --accept-
 winget install --source winget --id Apache.DirectoryStudio -e --accept-source-agreements --accept-package-agreements
 winget install -e --id CrystalDewWorld.CrystalDiskInfo --accept-source-agreements --accept-package-agreements                       # Disk
 winget install -e --id smartmontools.smartmontools --accept-source-agreements --accept-package-agreements                           # Disk
-$env:Path += ";C:\Program Files\smartmontools\bin"
+[Environment]::SetEnvironmentVariable(
+  "Path",
+  [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\Program Files\smartmontools\bin",
+  "User"
+)
 
 # Languages
 winget install --id Python.Python.3.14 -e --accept-source-agreements --accept-package-agreements                                    # WARNING - Version Needs to be Manually Bumped
