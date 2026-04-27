@@ -8,7 +8,7 @@ if (-not (Test-Path $TaskFolder)) {
 }
 
 $ScriptContent = @'
-robocopy "D:\Share\Backups\Black Fags\savegames" "E:\I" /E /COPY:DAT /DCOPY:DAT /R:3 /W:5 /MT:16 /TEE /LOG+:"C:\Tasks\Backup-Share.log" /NJH /NP
+robocopy "D:\Share" "E:\Share" /E /COPY:DAT /DCOPY:DAT /R:3 /W:5 /MT:16 /TEE /LOG+:"C:\Tasks\Backup-Share.log" /NJH /NP
 '@
 $ScriptContent | Out-File -FilePath $ScriptPath -Encoding UTF8 -Force
 
