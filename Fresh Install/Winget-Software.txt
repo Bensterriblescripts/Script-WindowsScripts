@@ -12,6 +12,7 @@ winget install --id GitHub.GitHubDesktop -e --accept-source-agreements --accept-
 winget install --source winget --id Apache.DirectoryStudio -e --accept-source-agreements --accept-package-agreements
 winget install -e --id CrystalDewWorld.CrystalDiskInfo --accept-source-agreements --accept-package-agreements                       # Disk
 winget install -e --id smartmontools.smartmontools --accept-source-agreements --accept-package-agreements                           # Disk
+$env:Path += ";C:\Program Files\smartmontools\bin"
 
 # Languages
 winget install --id Python.Python.3.14 -e --accept-source-agreements --accept-package-agreements                                    # WARNING - Version Needs to be Manually Bumped
@@ -22,10 +23,8 @@ winget install --source winget --id Kitware.CMake -e --accept-source-agreements 
 winget install --source winget --id OpenJS.NodeJS -e --accept-source-agreements --accept-package-agreements
 #winget install --source winget --id EclipseAdoptium.Temurin.26.JDK -e --accept-source-agreements --accept-package-agreements       # WARNING - Version Needs to be Manually Bumped
 
-# Jellyfin
-#winget install --id Jellyfin.Server -e --accept-source-agreements --accept-package-agreements                                      # Launch the tray icon once in Progam Files/Jellyfin/windows-tray-icon
-winget install --id Jellyfin.JellyfinMediaPlayer -e --accept-source-agreements --accept-package-agreements
-
 # Extras
 winget install -e --id Vivaldi.Vivaldi --accept-source-agreements --accept-package-agreements
 winget install -e --id VideoLAN.VLC --accept-source-agreements --accept-package-agreements
+# winget install --id Jellyfin.Server -e --accept-source-agreements --accept-package-agreements                                     # Launch the tray icon once in Progam Files/Jellyfin/windows-tray-icon
+winget install --id Jellyfin.JellyfinMediaPlayer -e --accept-source-agreements --accept-package-agreements
