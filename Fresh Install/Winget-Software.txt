@@ -23,3 +23,6 @@ winget install --source winget --id OpenJS.NodeJS -e --accept-source-agreements 
 # Jellyfin
 #winget install --id Jellyfin.Server -e --accept-source-agreements --accept-package-agreements                                      # Launch the tray icon once in Progam Files/Jellyfin/windows-tray-icon
 winget install --id Jellyfin.JellyfinMediaPlayer -e --accept-source-agreements --accept-package-agreements
+
+# Extras
+winget install -e --id Vivaldi.Vivaldi --accept-source-agreements --accept-package-agreements
