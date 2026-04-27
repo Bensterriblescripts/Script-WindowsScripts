@@ -8,7 +8,7 @@ if (-not (Test-Path $TaskFolder)) {
 }
 
 $ScriptContent = @'
-robocopy "I:\Share" "D:\Share" /E /COPY:DAT /DCOPY:DAT /R:3 /W:2 /MT:8 /TEE /LOG+:"C:\Tasks\Backup-Share.log" /NJH /NP /XJ
+robocopy "C:\Users\Administrator\.vm" "D:\VM" /E /COPY:DAT /DCOPY:DAT /R:3 /W:2 /MT:8 /TEE /LOG+:"C:\Tasks\Backup-Share.log" /NJH /NP /XJ
 '@
 $ScriptContent | Out-File -FilePath $ScriptPath -Encoding ASCII -Force # Use ASCII, CMD doeesn't like the powershell formatting
 
