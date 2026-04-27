@@ -10,16 +10,17 @@ winget install --id GitHub.GitHubDesktop -e --accept-source-agreements --accept-
 
 # System Administration
 winget install --source winget --id Apache.DirectoryStudio -e --accept-source-agreements --accept-package-agreements
-winget install -e --id CrystalDewWorld.CrystalDiskInfo --accept-source-agreements --accept-package-agreements
+winget install -e --id CrystalDewWorld.CrystalDiskInfo --accept-source-agreements --accept-package-agreements                       # Disk
+winget install -e --id smartmontools.smartmontools --accept-source-agreements --accept-package-agreements                           # Disk
 
 # Languages
-winget install --id Python.Python.3.14 -e --accept-source-agreements --accept-package-agreements                                    # Version Needs Manual Bumping
+winget install --id Python.Python.3.14 -e --accept-source-agreements --accept-package-agreements                                    # WARNING - Version Needs to be Manually Bumped
 winget install --source winget --id Rustlang.Rustup -e --accept-source-agreements --accept-package-agreements
-winget install --source winget --id PHP.PHP.8.5 -e --accept-source-agreements --accept-package-agreements                           # Version Needs Manual Bumping
+winget install --source winget --id PHP.PHP.8.5 -e --accept-source-agreements --accept-package-agreements                           # WARNING - Version Needs to be Manually Bumped
 winget install --source winget --id GoLang.Go -e --accept-source-agreements --accept-package-agreements
 winget install --source winget --id Kitware.CMake -e --accept-source-agreements --accept-package-agreements
 winget install --source winget --id OpenJS.NodeJS -e --accept-source-agreements --accept-package-agreements
-#winget install --source winget --id EclipseAdoptium.Temurin.26.JDK -e --accept-source-agreements --accept-package-agreements       # Version Needs Manual Bumping
+#winget install --source winget --id EclipseAdoptium.Temurin.26.JDK -e --accept-source-agreements --accept-package-agreements       # WARNING - Version Needs to be Manually Bumped
 
 # Jellyfin
 #winget install --id Jellyfin.Server -e --accept-source-agreements --accept-package-agreements                                      # Launch the tray icon once in Progam Files/Jellyfin/windows-tray-icon
