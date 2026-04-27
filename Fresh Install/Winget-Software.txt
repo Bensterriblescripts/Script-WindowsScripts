@@ -2,14 +2,15 @@
 winget install --id Microsoft.VisualStudio.Community -e
 Start-Process "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" -Wait
 
-# Administration Tools
+# Development Tooling
 winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
 winget install --id Gyan.FFmpeg -e --accept-source-agreements --accept-package-agreements
 winget install --id Microsoft.VisualStudioCode -e --accept-source-agreements --accept-package-agreements
 winget install --id GitHub.GitHubDesktop -e --accept-source-agreements --accept-package-agreements
 
-# Administration Tools
+# System Administration
 winget install --source winget --id Apache.DirectoryStudio -e --accept-source-agreements --accept-package-agreements
+winget install -e --id CrystalDewWorld.CrystalDiskInfo --accept-source-agreements --accept-package-agreements
 
 # Languages
 winget install --id Python.Python.3.14 -e --accept-source-agreements --accept-package-agreements                                    # Version Needs Manual Bumping
