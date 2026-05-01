@@ -1,9 +1,3 @@
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-  Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',('"{0}"'-f$PSCommandPath); exit
-}
-
-reg.exe add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /ve /d "" /f
-
 $MenuName = 'Launch Codex'
 $MenuText = 'Launch Codex'
 $PreLaunchCommand = @'
@@ -25,7 +19,7 @@ Get-ChildItem -LiteralPath (Join-Path $CodexHome 'sessions') -Force -ErrorAction
 }
 '@
 $WtExe = (Get-Command wt.exe -ErrorAction Stop).Source
-$CodexCommand = Get-Command codex -ErrorAction Stop | Select-Object -First 1
+$CodexCommand = Get-Command codex -ErrorAction SilentlyContinue | Select-Object -First 1
 $CodexExeCommand = Get-Command codex.exe -ErrorAction SilentlyContinue | Select-Object -First 1
 $PowerShellExe = (Get-Command powershell.exe -ErrorAction Stop).Source
 $CodexLaunchTarget = $null
@@ -36,12 +30,12 @@ if ($CodexExeCommand -and $CodexExeCommand.Source) {
   $CodexIcon = $CodexExeCommand.Source
 }
 
-if ($CodexCommand.CommandType -eq 'Application' -and [IO.Path]::GetExtension($CodexCommand.Source) -ieq '.exe') {
+if ($CodexCommand -and $CodexCommand.CommandType -eq 'Application' -and [IO.Path]::GetExtension($CodexCommand.Source) -ieq '.exe') {
   $CodexLaunchTarget = $CodexCommand.Source
   if (-not $CodexIcon) {
     $CodexIcon = $CodexCommand.Source
   }
-} elseif ($CodexCommand.Source) {
+} elseif ($CodexCommand -and $CodexCommand.Source) {
   $ShimDirectory = Split-Path $CodexCommand.Source -Parent
   $BundledCodexExe = Join-Path $ShimDirectory 'node_modules\@openai\codex\node_modules\@openai\codex-win32-x64\vendor\x86_64-pc-windows-msvc\codex\codex.exe'
   if (Test-Path $BundledCodexExe) {
@@ -79,11 +73,11 @@ function New-CodexCommand([string]$WindowsPathToken) {
 
 $Targets = @(
   @{
-    KeyPath = "HKLM:\Software\Classes\Directory\shell\$MenuName"
+    KeyPath = "HKCU:\Software\Classes\Directory\shell\$MenuName"
     Command = New-CodexCommand "%1"
   },
   @{
-    KeyPath = "HKLM:\Software\Classes\Directory\Background\shell\$MenuName"
+    KeyPath = "HKCU:\Software\Classes\Directory\Background\shell\$MenuName"
     Command = New-CodexCommand "%V"
   }
 )
