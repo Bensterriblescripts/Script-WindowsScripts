@@ -1,23 +1,23 @@
 $MenuName = 'Launch Codex'
 $MenuText = 'Launch Codex'
-$PreLaunchCommand = @'
-$CodexHome = Join-Path $env:USERPROFILE '.codex'
-@(
-  'models_cache.json'
-  'state_5.sqlite'
-  'state_5.sqlite-shm'
-  'state_5.sqlite-wal'
-  'logs_2.sqlite'
-  'logs_2.sqlite-shm'
-  'logs_2.sqlite-wal'
-  'log\codex-tui.log'
-) | ForEach-Object {
-  Remove-Item -LiteralPath (Join-Path $CodexHome $_) -Force -ErrorAction SilentlyContinue
-}
-Get-ChildItem -LiteralPath (Join-Path $CodexHome 'sessions') -Force -ErrorAction SilentlyContinue | ForEach-Object {
-  Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
-}
-'@
+# $PreLaunchCommand = @'
+# $CodexHome = Join-Path $env:USERPROFILE '.codex'
+# @(
+#   'models_cache.json'
+#   'state_5.sqlite'
+#   'state_5.sqlite-shm'
+#   'state_5.sqlite-wal'
+#   'logs_2.sqlite'
+#   'logs_2.sqlite-shm'
+#   'logs_2.sqlite-wal'
+#   'log\codex-tui.log'
+# ) | ForEach-Object {
+#   Remove-Item -LiteralPath (Join-Path $CodexHome $_) -Force -ErrorAction SilentlyContinue
+# }
+# Get-ChildItem -LiteralPath (Join-Path $CodexHome 'sessions') -Force -ErrorAction SilentlyContinue | ForEach-Object {
+#   Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+# }
+# '@
 $WtExe = (Get-Command wt.exe -ErrorAction Stop).Source
 $CodexCommand = Get-Command codex -ErrorAction SilentlyContinue | Select-Object -First 1
 $CodexExeCommand = Get-Command codex.exe -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -54,15 +54,15 @@ function ConvertTo-SingleQuotedPowerShellString([string]$Value) {
 }
 
 function New-CodexCommand([string]$WindowsPathToken) {
-  if (-not [string]::IsNullOrWhiteSpace($PreLaunchCommand)) {
-    $CodexInvocation = if ($CodexLaunchTarget) {
-      "& $(ConvertTo-SingleQuotedPowerShellString $CodexLaunchTarget)"
-    } else {
-      'codex'
-    }
-    $EncodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes("Invoke-Expression $(ConvertTo-SingleQuotedPowerShellString $PreLaunchCommand); $CodexInvocation"))
-    return "`"$WtExe`" -d `"$WindowsPathToken`" `"$PowerShellExe`" -NoExit -ExecutionPolicy Bypass -EncodedCommand $EncodedCommand"
-  }
+  # if (-not [string]::IsNullOrWhiteSpace($PreLaunchCommand)) {
+  #   $CodexInvocation = if ($CodexLaunchTarget) {
+  #     "& $(ConvertTo-SingleQuotedPowerShellString $CodexLaunchTarget)"
+  #   } else {
+  #     'codex'
+  #   }
+  #   $EncodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes("Invoke-Expression $(ConvertTo-SingleQuotedPowerShellString $PreLaunchCommand); $CodexInvocation"))
+  #   return "`"$WtExe`" -d `"$WindowsPathToken`" `"$PowerShellExe`" -NoExit -ExecutionPolicy Bypass -EncodedCommand $EncodedCommand"
+  # }
 
   if ($CodexLaunchTarget) {
     return "`"$WtExe`" -d `"$WindowsPathToken`" `"$CodexLaunchTarget`""
